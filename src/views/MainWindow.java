@@ -1,7 +1,11 @@
 package views;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Container;
 import java.awt.EventQueue;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -16,18 +20,22 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.awt.event.ActionEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.Dimension;
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.EtchedBorder;
+
+import model.Grid;
+
 import javax.swing.JTextField;
 import javax.swing.JCheckBox;
 import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.JButton;
 import javax.swing.JLabel;
-
 
 public class MainWindow extends JFrame {
 
@@ -41,8 +49,9 @@ public class MainWindow extends JFrame {
 	private JPanel panel;
 	NeuesRaetselDialog dialog = new NeuesRaetselDialog();
 	private int intNumberOfBridges;
-	
-	
+	private JLabel lblNotification;
+	Grid grid;
+
 	/**
 	 * Launch the application.
 	 */
@@ -52,7 +61,7 @@ public class MainWindow extends JFrame {
 				try {
 					MainWindow frame = new MainWindow();
 					frame.setVisible(true);
-					
+
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -75,7 +84,7 @@ public class MainWindow extends JFrame {
 		setBounds(100, 100, 600, 700);
 
 		dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-		
+
 		JMenuBar menuBar = new JMenuBar();
 		setJMenuBar(menuBar);
 
@@ -83,7 +92,7 @@ public class MainWindow extends JFrame {
 		menuBar.add(mnDatei);
 
 		mntmNeuesRaetsel = new JMenuItem("Neues R\u00E4tsel");
-		
+
 		mnDatei.add(mntmNeuesRaetsel);
 
 		mntmRtselNeuStarten = new JMenuItem("R\u00E4tsel neu starten");
@@ -107,53 +116,33 @@ public class MainWindow extends JFrame {
 
 		panel = new JPanel();
 		panel.setBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null));
-		
+
 		JCheckBox chckbxShowMissingBridges = new JCheckBox("Anzahl fehlender Br\u00FCcken anzeigen");
-		
+
 		JButton btnAutoSolve = new JButton("Automatisch l\u00F6sen");
-		
+
 		JButton btnNchsteBrcke = new JButton("N\u00E4chste Br\u00FCcke");
-		
-		JLabel lblNotification = new JLabel("Willkommen bei Bridges!");
+
+		lblNotification = new JLabel("Willkommen bei Bridges!");
 		GroupLayout gl_contentPane = new GroupLayout(contentPane);
-		gl_contentPane.setHorizontalGroup(
-			gl_contentPane.createParallelGroup(Alignment.LEADING)
+		gl_contentPane.setHorizontalGroup(gl_contentPane.createParallelGroup(Alignment.LEADING)
 				.addComponent(panel, GroupLayout.DEFAULT_SIZE, 584, Short.MAX_VALUE)
+				.addGroup(
+						gl_contentPane.createSequentialGroup().addComponent(chckbxShowMissingBridges).addContainerGap())
+				.addGroup(gl_contentPane.createSequentialGroup().addComponent(btnAutoSolve).addGap(33)
+						.addComponent(btnNchsteBrcke).addGap(343))
+				.addGroup(gl_contentPane.createSequentialGroup().addComponent(lblNotification).addContainerGap()));
+		gl_contentPane.setVerticalGroup(gl_contentPane.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_contentPane.createSequentialGroup()
-					.addComponent(chckbxShowMissingBridges)
-					.addContainerGap())
-				.addGroup(gl_contentPane.createSequentialGroup()
-					.addComponent(btnAutoSolve)
-					.addGap(33)
-					.addComponent(btnNchsteBrcke)
-					.addGap(343))
-				.addGroup(gl_contentPane.createSequentialGroup()
-					.addComponent(lblNotification)
-					.addContainerGap())
-		);
-		gl_contentPane.setVerticalGroup(
-			gl_contentPane.createParallelGroup(Alignment.LEADING)
-				.addGroup(gl_contentPane.createSequentialGroup()
-					.addComponent(panel, GroupLayout.PREFERRED_SIZE, 500, GroupLayout.PREFERRED_SIZE)
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(chckbxShowMissingBridges)
-					.addGap(27)
-					.addGroup(gl_contentPane.createParallelGroup(Alignment.BASELINE)
-						.addComponent(btnAutoSolve)
-						.addComponent(btnNchsteBrcke))
-					.addPreferredGap(ComponentPlacement.RELATED, 29, Short.MAX_VALUE)
-					.addComponent(lblNotification)
-					.addGap(23))
-		);
+						.addComponent(panel, GroupLayout.PREFERRED_SIZE, 500, GroupLayout.PREFERRED_SIZE)
+						.addPreferredGap(ComponentPlacement.RELATED).addComponent(chckbxShowMissingBridges).addGap(27)
+						.addGroup(gl_contentPane.createParallelGroup(Alignment.BASELINE).addComponent(btnAutoSolve)
+								.addComponent(btnNchsteBrcke))
+						.addPreferredGap(ComponentPlacement.RELATED, 29, Short.MAX_VALUE).addComponent(lblNotification)
+						.addGap(23)));
 		GroupLayout gl_panel = new GroupLayout(panel);
-		gl_panel.setHorizontalGroup(
-			gl_panel.createParallelGroup(Alignment.LEADING)
-				.addGap(0, 580, Short.MAX_VALUE)
-		);
-		gl_panel.setVerticalGroup(
-			gl_panel.createParallelGroup(Alignment.LEADING)
-				.addGap(0, 496, Short.MAX_VALUE)
-		);
+		gl_panel.setHorizontalGroup(gl_panel.createParallelGroup(Alignment.LEADING).addGap(0, 580, Short.MAX_VALUE));
+		gl_panel.setVerticalGroup(gl_panel.createParallelGroup(Alignment.LEADING).addGap(0, 496, Short.MAX_VALUE));
 		panel.setLayout(gl_panel);
 		contentPane.setLayout(gl_contentPane);
 	}
@@ -173,30 +162,44 @@ public class MainWindow extends JFrame {
 				confirmProgramExit();
 			}
 		});
-		
+
 		mntmNeuesRaetsel.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				createNewTask();
 			}
-
-			
 		});
-		
+
 	}
 
 	private void createNewTask() {
-		// TODO Auto-generated method stub
+		// Erstelle neues Spielfeld
 		try {
-			
+
 			dialog.setVisible(true);
-			
-			
+			dialog.okButton.addMouseListener(new MouseAdapter() {
+				@Override
+				public void mouseReleased(MouseEvent e) {
+
+					drawField();
+				}
+			});
+
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		
+
 	}
-	
+
+	protected void drawField() {
+		// TODO Auto-generated method stub
+		grid = new Grid(dialog.getFieldWidth(), dialog.getFieldHeight(), panel.getWidth(), panel.getHeight());
+		grid.createGrid();
+		Field field = new Field();
+		field.setSize(panel.getWidth(), panel.getHeight());
+		panel.add(field);
+		//panel.setVisible(true);
+	}
+
 	private void confirmProgramExit() {
 		// Sicherheitsabfrage vor Beenden des Spiels
 		if (JOptionPane.showConfirmDialog(null,
@@ -205,4 +208,30 @@ public class MainWindow extends JFrame {
 			System.exit(0);
 		}
 	}
+
+	/**
+	 * Zeichnet die Inseln auf das Spielfeld
+	 */
+	private class Field extends JPanel {
+		// Override paintComponent to perform your own painting
+		@Override
+		public void paintComponent(Graphics g) {
+
+			super.paintComponent(g);
+			Graphics2D graphics2d = (Graphics2D) g;
+			graphics2d.setColor(Color.BLUE); // set the drawing color
+			for (int i = 1; i < 10; i++) {
+				//graphics2d.drawOval(10 + i, 10 + i, 10, 10);
+			}
+			//graphics2d.drawOval(100, 100, 10, 10);
+			//graphics2d.drawOval(500, 500, 10, 10);
+			for (int x : grid.getxCoordinates()) {
+				for (int y : grid.getyCoordinates()) {
+					System.out.println(x + "; " + y);
+					graphics2d.drawOval(x, y, 10, 10);
+				}
+			}
+		}
+	}
+
 }

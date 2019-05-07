@@ -23,27 +23,52 @@ import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseMotionAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseAdapter;
 
 public class NeuesRaetselDialog extends JDialog {
 
 	private final JPanel contentPanel = new JPanel();
 	private JTextField txtWidth;
 	private JTextField txtHeight;
-	private JTextField txtIsles;
+	private JTextField txtIslands;
 	private JRadioButton rdbtnAutoSize;
 	private JRadioButton rdbtnCustomSize;
 	private JCheckBox chckbxCustomNumber;
 	private final ButtonGroup buttonGroup = new ButtonGroup();
-	private JButton okButton;
+	JButton okButton;
 	private JButton cancelButton;
+	private int numberOfIslands;
+	private int fieldWidth;
+	private int fieldHeight;
 
-	public int getBreite() {
-		return Integer.parseInt(txtWidth.getText());
+	// Getter- und Setter-Funktionen
+
+	
+	private void setNumberOfIslands(int numberOfIslands) {
+		this.numberOfIslands = numberOfIslands;	
 	}
 
-	public void setBreite(int breite) {
-		this.txtWidth.setText("" + breite);
+	private void setFieldHeight(int fieldHeight) {
+		this.fieldHeight = fieldHeight;
 	}
+
+	private void setFieldWidth(int fieldWidth) {
+		this.fieldWidth = fieldWidth;	
+	}
+	
+	public int getNumberOfIslands() {
+		return numberOfIslands;
+	}
+
+	public int getFieldWidth() {
+		return fieldWidth;
+	}
+
+	public int getFieldHeight() {
+		return fieldHeight;
+	}
+
+	
 
 	/**
 	 * Create the dialog.
@@ -73,21 +98,21 @@ public class NeuesRaetselDialog extends JDialog {
 		chckbxCustomNumber.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				if (chckbxCustomNumber.isSelected())
-					txtIsles.setEditable(true);
+					txtIslands.setEditable(true);
 				else
-					txtIsles.setEditable(false);
+					txtIslands.setEditable(false);
 
 			}
 		});
 		
 		// Maus bewegt sich über Feld für Inselanzahl
-		txtIsles.addMouseMotionListener(new MouseMotionAdapter() {
+		txtIslands.addMouseMotionListener(new MouseMotionAdapter() {
 			@Override
 			public void mouseMoved(MouseEvent e) {
-				try { txtIsles.setToolTipText("Erlaubte Anzahl der Inseln bei der derzeitigen Feldgröße: 2 - " + (Integer.parseInt(txtWidth.getText()) * Integer.parseInt(txtHeight.getText())) / 5);
+				try { txtIslands.setToolTipText("Erlaubte Anzahl der Inseln bei der derzeitigen Feldgröße: 2 - " + (Integer.parseInt(txtWidth.getText()) * Integer.parseInt(txtHeight.getText())) / 5);
 				}
 				catch (IllegalArgumentException ex) {
-					txtIsles.setToolTipText("Erlaubte Anzahl der Inseln kann erst nach Eingabe einer zulässigen Feldgröße ermittelt werden...");
+					txtIslands.setToolTipText("Erlaubte Anzahl der Inseln kann erst nach Eingabe einer zulässigen Feldgröße ermittelt werden...");
 				}
 			}
 		});
@@ -97,15 +122,19 @@ public class NeuesRaetselDialog extends JDialog {
 		okButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				if (checkFieldValues())
+					setFieldWidth(Integer.parseInt(txtWidth.getText()));
+					setFieldHeight(Integer.parseInt(txtHeight.getText()));
+					setNumberOfIslands(Integer.parseInt(txtIslands.getText()));
 					dispose();
 			}
 		});
 
 	}
 
+
 	private void initElements() {
 		// TODO Auto-generated method stub
-		setBounds(100, 100, 293, 298);
+				setBounds(100, 100, 293, 298);
 		setTitle("Neues Rätsel");
 		getContentPane().setLayout(new BorderLayout());
 		contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
@@ -134,11 +163,11 @@ public class NeuesRaetselDialog extends JDialog {
 
 		chckbxCustomNumber = new JCheckBox("Inselanzahl festlegen");
 
-		JLabel lblIsles = new JLabel("Inseln:");
+		JLabel lblIslands = new JLabel("Inseln:");
 
-		txtIsles = new JTextField();
-		txtIsles.setText("3");
-		txtIsles.setColumns(10);
+		txtIslands = new JTextField();
+		txtIslands.setText("3");
+		txtIslands.setColumns(10);
 		GroupLayout gl_contentPanel = new GroupLayout(contentPanel);
 		gl_contentPanel.setHorizontalGroup(gl_contentPanel.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_contentPanel.createSequentialGroup()
@@ -157,8 +186,8 @@ public class NeuesRaetselDialog extends JDialog {
 												.addGap(18).addComponent(txtWidth, GroupLayout.PREFERRED_SIZE,
 														GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
 										.addComponent(chckbxCustomNumber)
-										.addGroup(gl_contentPanel.createSequentialGroup().addComponent(lblIsles)
-												.addGap(18).addComponent(txtIsles, GroupLayout.PREFERRED_SIZE,
+										.addGroup(gl_contentPanel.createSequentialGroup().addComponent(lblIslands)
+												.addGap(18).addComponent(txtIslands, GroupLayout.PREFERRED_SIZE,
 														GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)))))
 						.addContainerGap(110, Short.MAX_VALUE)));
 		gl_contentPanel.setVerticalGroup(gl_contentPanel.createParallelGroup(Alignment.LEADING).addGroup(gl_contentPanel
@@ -172,8 +201,8 @@ public class NeuesRaetselDialog extends JDialog {
 						txtHeight, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
 				.addPreferredGap(ComponentPlacement.UNRELATED).addComponent(chckbxCustomNumber)
 				.addPreferredGap(ComponentPlacement.UNRELATED)
-				.addGroup(gl_contentPanel.createParallelGroup(Alignment.BASELINE).addComponent(lblIsles).addComponent(
-						txtIsles, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+				.addGroup(gl_contentPanel.createParallelGroup(Alignment.BASELINE).addComponent(lblIslands).addComponent(
+						txtIslands, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
 				.addContainerGap(35, Short.MAX_VALUE)));
 		contentPanel.setLayout(gl_contentPanel);
 		{
@@ -188,13 +217,15 @@ public class NeuesRaetselDialog extends JDialog {
 			}
 			{
 				okButton = new JButton("OK");
-
 				okButton.setActionCommand("OK");
 				buttonPane.add(okButton);
 				getRootPane().setDefaultButton(okButton);
 			}
 		}
-
+		
+		setFieldWidth(Integer.parseInt(txtWidth.getText()));
+		setFieldHeight(Integer.parseInt(txtHeight.getText()));
+		setNumberOfIslands(Integer.parseInt(txtIslands.getText()));
 	}
 
 	private void refreshSettings() {
@@ -205,13 +236,13 @@ public class NeuesRaetselDialog extends JDialog {
 		if (rdbtnAutoSize.isSelected()) {
 			int randWidth = ThreadLocalRandom.current().nextInt(4, 25 + 1);
 			int randHeight = ThreadLocalRandom.current().nextInt(4, 25 + 1);
-			long randIsles = ThreadLocalRandom.current().nextInt(2, (int) ((randWidth * randHeight) / 5) + 1);
+			long randIslands = ThreadLocalRandom.current().nextInt(2, (int) ((randWidth * randHeight) / 5) + 1);
 			txtWidth.setText(String.valueOf(randWidth));
 			txtHeight.setText(String.valueOf(randHeight));
-			txtIsles.setText(String.valueOf(randIsles));
+			txtIslands.setText(String.valueOf(randIslands));
 			txtWidth.setEditable(false);
 			txtHeight.setEditable(false);
-			txtIsles.setEditable(false);
+			txtIslands.setEditable(false);
 			chckbxCustomNumber.setEnabled(false);
 		} else {
 			txtWidth.setEditable(true);
@@ -228,15 +259,15 @@ public class NeuesRaetselDialog extends JDialog {
 		try {
 			int width = Integer.parseInt(txtWidth.getText());
 			int height = Integer.parseInt(txtHeight.getText());
-			int isles = Integer.parseInt(txtIsles.getText());
-			int maxIslesAllowed = (int) ((width * height) / 5);
+			int islands = Integer.parseInt(txtIslands.getText());
+			int maxIslandsAllowed = (int) ((width * height) / 5);
 			if ((width < 4) || (width > 25) || (height < 4) || (height > 25)) {
 				JOptionPane.showMessageDialog(null,
 						"Höhe und Breite des Spielfelds müssen sich zwischen den Werten 4 und 25 befinden!");
 				return false;
-			} else if ((isles > maxIslesAllowed) || (isles < 2)) {
+			} else if ((islands > maxIslandsAllowed) || (islands < 2)) {
 				JOptionPane.showMessageDialog(null, "Auf einem Spielfeld dieser Größe können sich 2 - "
-						+ maxIslesAllowed + " Inseln befinden!");
+						+ maxIslandsAllowed + " Inseln befinden!");
 				return false;
 			} else
 				return true;
