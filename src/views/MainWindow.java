@@ -50,7 +50,7 @@ public class MainWindow extends JFrame {
 	NeuesRaetselDialog dialog = new NeuesRaetselDialog();
 	private int intNumberOfBridges;
 	private JLabel lblNotification;
-	Grid grid;
+	Grid grid = new Grid(2, 2, 1, 1, 1);
 
 	/**
 	 * Launch the application.
@@ -114,7 +114,7 @@ public class MainWindow extends JFrame {
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
 
-		panel = new JPanel();
+		panel = new Field();
 		panel.setBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null));
 
 		JCheckBox chckbxShowMissingBridges = new JCheckBox("Anzahl fehlender Br\u00FCcken anzeigen");
@@ -125,21 +125,33 @@ public class MainWindow extends JFrame {
 
 		lblNotification = new JLabel("Willkommen bei Bridges!");
 		GroupLayout gl_contentPane = new GroupLayout(contentPane);
-		gl_contentPane.setHorizontalGroup(gl_contentPane.createParallelGroup(Alignment.LEADING)
-				.addComponent(panel, GroupLayout.DEFAULT_SIZE, 584, Short.MAX_VALUE)
-				.addGroup(
-						gl_contentPane.createSequentialGroup().addComponent(chckbxShowMissingBridges).addContainerGap())
-				.addGroup(gl_contentPane.createSequentialGroup().addComponent(btnAutoSolve).addGap(33)
-						.addComponent(btnNchsteBrcke).addGap(343))
-				.addGroup(gl_contentPane.createSequentialGroup().addComponent(lblNotification).addContainerGap()));
-		gl_contentPane.setVerticalGroup(gl_contentPane.createParallelGroup(Alignment.LEADING)
+		gl_contentPane.setHorizontalGroup(
+			gl_contentPane.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_contentPane.createSequentialGroup()
-						.addComponent(panel, GroupLayout.PREFERRED_SIZE, 500, GroupLayout.PREFERRED_SIZE)
-						.addPreferredGap(ComponentPlacement.RELATED).addComponent(chckbxShowMissingBridges).addGap(27)
-						.addGroup(gl_contentPane.createParallelGroup(Alignment.BASELINE).addComponent(btnAutoSolve)
-								.addComponent(btnNchsteBrcke))
-						.addPreferredGap(ComponentPlacement.RELATED, 29, Short.MAX_VALUE).addComponent(lblNotification)
-						.addGap(23)));
+					.addGroup(gl_contentPane.createParallelGroup(Alignment.LEADING)
+						.addComponent(chckbxShowMissingBridges)
+						.addGroup(gl_contentPane.createSequentialGroup()
+							.addComponent(btnAutoSolve)
+							.addGap(33)
+							.addComponent(btnNchsteBrcke))
+						.addComponent(lblNotification)
+						.addComponent(panel, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+					.addContainerGap(18, Short.MAX_VALUE))
+		);
+		gl_contentPane.setVerticalGroup(
+			gl_contentPane.createParallelGroup(Alignment.LEADING)
+				.addGroup(gl_contentPane.createSequentialGroup()
+					.addComponent(panel, GroupLayout.PREFERRED_SIZE, 500, GroupLayout.PREFERRED_SIZE)
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addComponent(chckbxShowMissingBridges)
+					.addGap(27)
+					.addGroup(gl_contentPane.createParallelGroup(Alignment.BASELINE)
+						.addComponent(btnAutoSolve)
+						.addComponent(btnNchsteBrcke))
+					.addPreferredGap(ComponentPlacement.RELATED, 29, Short.MAX_VALUE)
+					.addComponent(lblNotification)
+					.addGap(23))
+		);
 		GroupLayout gl_panel = new GroupLayout(panel);
 		gl_panel.setHorizontalGroup(gl_panel.createParallelGroup(Alignment.LEADING).addGap(0, 580, Short.MAX_VALUE));
 		gl_panel.setVerticalGroup(gl_panel.createParallelGroup(Alignment.LEADING).addGap(0, 496, Short.MAX_VALUE));
@@ -179,7 +191,6 @@ public class MainWindow extends JFrame {
 			dialog.okButton.addMouseListener(new MouseAdapter() {
 				@Override
 				public void mouseReleased(MouseEvent e) {
-
 					drawField();
 				}
 			});
@@ -190,16 +201,15 @@ public class MainWindow extends JFrame {
 
 	}
 
+
 	protected void drawField() {
 		// TODO Auto-generated method stub
-		grid = new Grid(dialog.getFieldWidth(), dialog.getFieldHeight(), panel.getWidth(), panel.getHeight());
-		grid.createGrid();
-		Field field = new Field();
-		field.setSize(panel.getWidth(), panel.getHeight());
-		panel.add(field);
-		//panel.setVisible(true);
+		grid = new Grid(dialog.getFieldWidth(), dialog.getFieldHeight(), panel.getWidth(), panel.getHeight(), dialog.getNumberOfIslands());
+		panel.repaint();
 	}
 
+
+	
 	private void confirmProgramExit() {
 		// Sicherheitsabfrage vor Beenden des Spiels
 		if (JOptionPane.showConfirmDialog(null,
@@ -213,25 +223,29 @@ public class MainWindow extends JFrame {
 	 * Zeichnet die Inseln auf das Spielfeld
 	 */
 	private class Field extends JPanel {
+		
 		// Override paintComponent to perform your own painting
 		@Override
 		public void paintComponent(Graphics g) {
-
+			
 			super.paintComponent(g);
+			
 			Graphics2D graphics2d = (Graphics2D) g;
 			graphics2d.setColor(Color.BLUE); // set the drawing color
-			for (int i = 1; i < 10; i++) {
-				//graphics2d.drawOval(10 + i, 10 + i, 10, 10);
-			}
-			//graphics2d.drawOval(100, 100, 10, 10);
-			//graphics2d.drawOval(500, 500, 10, 10);
+			
 			for (int x : grid.getxCoordinates()) {
 				for (int y : grid.getyCoordinates()) {
 					System.out.println(x + "; " + y);
 					graphics2d.drawOval(x, y, 10, 10);
 				}
 			}
+			
+			graphics2d.setColor(Color.RED); // set the drawing color
+			for (int i = 0; i < grid.getIslands().size(); i++) {
+				graphics2d.drawOval(grid.getIslands().get(i).getxPos(), grid.getIslands().get(i).getyPos(), 10, 10);
+			}
 		}
+		
 	}
 
 }
